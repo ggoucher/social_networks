@@ -1,4 +1,5 @@
 import nltk
+import numpy
 from nltk.stem.lancaster import LancasterStemmer
 import os
 import json
@@ -61,12 +62,70 @@ def organize_raw_training_data(raw_training_data, stemmer):
     return word_stems, classes, documents
 
 
+def create_training_data(word_stems, classes, documents, stemmer):
+    """
+    Generates training data based on whether or not words are present in each given sentence and which sentence format
+    is followed.
+
+    @param: word_stems A list of the word_stems found in preprocessing.
+    @param: Classes A list of the different types/formats of sentence class identified in preprocessing.
+    @param: Documents A collection of all the different tuples consisting of (lines, actor) pairs.
+    @param: Stemmer The Lancaster Stemmer which is part of NLTK
+    """
+
+    training_data = []  # A list of bags of words for each sentence as represented in our docs.
+    output = []  # A list of all the sentences and the classes within them.
+
+    for sentence in documents:
+
+        bag = []
+        class_id = []
+        sentence_stemmed = []
+
+        for word in sentence[0]:
+
+            sentence_stemmed.append(stemmer(word))
+
+        for word in word_stems:
+
+            if word in sentence_stemmed:
+
+                bag.append(1)
+
+            else:
+
+                bag.append(0)
+
+        for c in classes:
+
+            if c is sentence[1]:
+
+                class_id.append(1)
+
+            else:
+
+                class_id.append(0)
+
+        training_data.append(bag)
+        output.append(class_id)
+
+    return training_data, output
+
+def sigmoid(z):
+    """ Takes in z and returns the basic sigmoid function for it. """
+    return 1/((1) + numpy.exp(-z))
+
+def sigmoid_output_to_derivative(output):
+    """ Convert the sigmoid function's output to its derivative. """
+    return output * (1 - output)
+
+
 def main():
     stemmer = LancasterStemmer()
 
     raw_training_data = get_raw_training_data('dialogue_data.csv')  # organizes the script into characters
-    organize_raw_training_data(raw_training_data, stemmer)
-
+    word_stems, classes, documents = organize_raw_training_data(raw_training_data, stemmer)
+    training_data, output = create_training_data(word_stems, classes, documents, stemmer)
 
 if __name__ == "__main__":
     main()
