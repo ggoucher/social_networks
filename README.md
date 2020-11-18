@@ -9,6 +9,12 @@ need to download Punkt for sentence tokenization. To do so, open a python termin
     $ import nltk
     $ nltk.download('punkt')
 
+## Running the Classifier
+
+To run the classifier:
+
+    $ python dialogue_classifier.py
+
 ## Processing
 This classifier begins by parsing a csv file with lines of the form [actor], [line of dialogue].
 These are further processed into a dictionary mapping speakers to lines, and subsequently
